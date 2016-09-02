@@ -27,6 +27,8 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
 
     private Boolean mIsSupport = null;
 
+    private Activity mActivity;
+
     public MotionStrategy(InteractiveModeManager.Params params) {
         super(params);
     }
@@ -48,6 +50,7 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
 
     @Override
     public void on(Activity activity) {
+        mActivity = activity;
         mDeviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         for (MD360Director director : getDirectorList()){
             director.reset();
@@ -107,6 +110,9 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
             int type = event.sensor.getType();
             switch (type){
                 case Sensor.TYPE_ROTATION_VECTOR:
+                    if (mActivity != null) {
+                        mDeviceRotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+                    }
                     VRUtil.sensorRotationVector2Matrix(event, mDeviceRotation, mSensorMatrix);
                     for (MD360Director director : getDirectorList()){
                         director.updateSensorMatrix(mSensorMatrix);
